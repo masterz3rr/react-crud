@@ -1,21 +1,38 @@
 import TextField from "../TextField"
 import Button from "../Button"
 import {useState} from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { v4 as uuidv4 } from 'uuid';
+import { editUser } from "./UserSlice";
+
 
 const EditUser = () => {
+    
+    const dispatch = useDispatch();
+    const params = useParams();
+    const users = useSelector(store =>store.users);
+
+    const existingUser = users.filter(user => user.id === params.id);
+    const { name, email } = existingUser[0];
+
     const navigate = useNavigate();
     const [values, setValues] = useState({
-        name: '',
-        email: ''
+        name,
+        email
     });
 
-    const handleAddUser = () => {
+    const handlEditUser = () => {
         setValues({name:'',email:''});
+        dispatch(editUser({
+            id: params.id,
+            name: values.name,
+            email: values.email
+        }))
         navigate('/');
-        console.log(values);
     }
-    
+
   return (
     <div className="mt-10 mx-w-xl mx-auto">
         <TextField
@@ -37,7 +54,7 @@ const EditUser = () => {
                 placeholder: 'jerry.ale@gmail.com'
             }}
         />
-        <Button onClick={handleAddUser}>Submit</Button>
+        <Button onClick={handlEditUser}>Edit</Button>
     </div>
   )
 }
